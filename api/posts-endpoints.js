@@ -74,7 +74,7 @@ router.delete('/:id', (req,res) => {
         })
 })
 
-//POST to api/posts/:id/comments
+
 
 
 //GET api/posts/:id/comments
@@ -103,6 +103,35 @@ router.get('/:id',(req,res) => {
                 .catch(error => {
                     res.status(500).json({ error: "The post information could not be retrieved." })
                 })
+        }
+    })
+    .catch(error => {
+        res.status(500).json(error)
+    })
+})
+
+//POST to api/posts/:id/comments
+router.post('/:id/comments', (req,res) => {
+    Posts.findById(req.params.id)
+    .then(post => {
+        // console.log("----post.length---->", post.length)
+        if(post.length == 0 || post.length == null){
+            res.status(404).json({ message: "The post with the specified ID does not exist." })
+        }else{
+            // console.log('------------->', req.body)
+            if(!req.body.text){
+                res.status(400).json({ errorMessage: "Please provide text for the comment." })
+            }else{
+                console.log("req.body", req.body.text)
+                Posts.insertComment(req.body)
+                    .then(something => {
+                        console.log('------------>',something)
+                        res.status(201).json(something)
+                    })
+                    .catch(error => {
+                       res.status(500).json(error)
+                    })
+            }
         }
     })
     .catch(error => {
