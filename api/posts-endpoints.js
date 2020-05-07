@@ -75,47 +75,39 @@ router.delete('/:id', (req,res) => {
 })
 
 //POST to api/posts/:id/comments
-router.post('/:id/comments', (req,res) => {
-    Posts.findPostComments(req.params.id)
-        .then(([comment])=> {
-                if(!comment.text){
-                    res.status(400).json({errorMessage: "Please provide text for the comment."})
-                }else{
-                    Posts.findCommentById(comment.id)
-                    .then(comment => {
-                        Posts.insertComment(comment)
-                            .then(comment => {
-                                res.status(201).json(comment)
-                            })
-                            .catch(error => {
-                                res.status(500).json({error: "There was an error while saving the comment to the database"})
-                            })
-                    })
-                    .catch()
-                }                
-            res.status(201).json(comment)
-        })
-        .catch(error => {
-            res.status(404).json({message: "The post with the specified ID does not exist."})
-        })
-})
+
 
 //GET api/posts/:id/comments
-router.get('/:id/comments', (req,res) => {
-    Posts.findCommentById(req.params.id)
-        .then(comment => {
-            // Posts.findCommentById(something.id)
-            //     .then(something => {
-            //         console.log('-------->something', something)
-            //         res.status(201).json(something)
+// router.get('/:id/comments', (req,res) => {       
+       
+// })
 
-            //     })
-            console.log('---comment-------->', comment)
-            res.status(201).json(comment)
-        })
-        .catch(error => {
+//GET api/posts/:id
+router.get('/:id',(req,res) => {
+   Posts.findById(req.params.id)
+    .then(post => {
+        // console.log("----post.length---->", post.length)
+        if(post.length == 0 || post.length == null){
             res.status(404).json({ message: "The post with the specified ID does not exist." })
-        })
+        }else{
+            Posts.findPostComments(req.params.id)
+                .then(post_comment => {
+                    // console.log('-sdfg----->', post_comment)
+                    if(post_comment.length == 0 || post_comment.length == null){
+                        res.status(404).json({message: "no comment for this post"})
+                    }else{
+                        res.status(201).json(post_comment)
+                    }
+                    
+                })
+                .catch(error => {
+                    res.status(500).json({ error: "The post information could not be retrieved." })
+                })
+        }
+    })
+    .catch(error => {
+        res.status(500).json(error)
+    })
 })
 //console.log('---comment.id-------->',comment.id)
 
