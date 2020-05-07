@@ -112,6 +112,7 @@ router.get('/:id',(req,res) => {
 
 //POST to api/posts/:id/comments
 router.post('/:id/comments', (req,res) => {
+    let body = req.body;
     Posts.findById(req.params.id)
     .then(post => {
         // console.log("----post.length---->", post.length)
@@ -123,7 +124,8 @@ router.post('/:id/comments', (req,res) => {
                 res.status(400).json({ errorMessage: "Please provide text for the comment." })
             }else{
                 console.log("req.body", req.body.text)
-                Posts.insertComment(req.body)
+                body.post_id = req.params.id;
+                Posts.insertComment(body)
                     .then(something => {
                         console.log('------------>',something)
                         res.status(201).json(something)
