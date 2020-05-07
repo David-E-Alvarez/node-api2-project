@@ -56,5 +56,67 @@ router.put('/:id', (req,res) => {
     }
 })
 
+//DELETE api/posts/:id
+router.delete('/:id', (req,res) => {
+    const id = req.params.id;
+    Posts.findById(id)
+        .then(post => {
+            Posts.remove(id)
+                .then(post => {
+                    res.status(201).json(post)
+                })
+                .catch(error => {
+                    res.status(500).json({errorMessage: "The post could not be removed", error})
+                })
+        })
+        .catch(error => {
+            res.status(404).json({message: "The post with the specified ID does not exist."})
+        })
+})
+
+//POST to api/posts/:id/comments
+router.post('/:id/comments', (req,res) => {
+    Posts.findPostComments(req.params.id)
+        .then(([comment])=> {
+                if(!comment.text){
+                    res.status(400).json({errorMessage: "Please provide text for the comment."})
+                }else{
+                    Posts.findCommentById(comment.id)
+                    .then(comment => {
+                        Posts.insertComment(comment)
+                            .then(comment => {
+                                res.status(201).json(comment)
+                            })
+                            .catch(error => {
+                                res.status(500).json({error: "There was an error while saving the comment to the database"})
+                            })
+                    })
+                    .catch()
+                }                
+            res.status(201).json(comment)
+        })
+        .catch(error => {
+            res.status(404).json({message: "The post with the specified ID does not exist."})
+        })
+})
+
+//GET api/posts/:id/comments
+router.get('/:id/comments', (req,res) => {
+    Posts.findCommentById(req.params.id)
+        .then(comment => {
+            // Posts.findCommentById(something.id)
+            //     .then(something => {
+            //         console.log('-------->something', something)
+            //         res.status(201).json(something)
+
+            //     })
+            console.log('---comment-------->', comment)
+            res.status(201).json(comment)
+        })
+        .catch(error => {
+            res.status(404).json({ message: "The post with the specified ID does not exist." })
+        })
+})
+//console.log('---comment.id-------->',comment.id)
 
 module.exports = router;
