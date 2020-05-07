@@ -75,13 +75,6 @@ router.delete('/:id', (req,res) => {
 })
 
 
-
-
-//GET api/posts/:id/comments
-// router.get('/:id/comments', (req,res) => {       
-       
-// })
-
 //GET api/posts/:id
 router.get('/:id',(req,res) => {
    Posts.findById(req.params.id)
@@ -138,6 +131,26 @@ router.post('/:id/comments', (req,res) => {
     })
     .catch(error => {
         res.status(500).json(error)
+    })
+})
+
+//GET api/posts/:id/comments
+router.get('/:id/comments', (req,res) => {       
+    Posts.findById(req.params.id)
+    .then(post => {
+        // console.log("----post.length---->", post.length)
+        if(post.length == 0 || post.length == null){
+            res.status(404).json({ message: "The post with the specified ID does not exist." })
+        }else{
+            Posts.findPostComments(req.params.id)
+                .then(post_comment => {
+                    // console.log('-------------->', post_comment)
+                    res.status(201).json(post_comment)
+                })
+                .catch(error => {
+                    res.status(500).json({ error: "The comments information could not be retrieved." })
+                })
+        }   
     })
 })
 //console.log('---comment.id-------->',comment.id)
